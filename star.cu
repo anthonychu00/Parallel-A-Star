@@ -145,7 +145,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 
 			//start heuristic of Nodes not -1 in expandedNodes 
 			
-			/*for(int i=0;i<4;i++)
+			for(int i=0;i<4;i++)
 			{
 				
 				
@@ -153,10 +153,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 				{
 					int h = lowestCost[expandedNodes[i]]+				 							heuristic(dim,expandedNodes[i],end);
 					int check =0; 
-//int targetLocation=findNextInsertionPoint(sizes, k);
-//int l = atomicCAS(&array[targetLocation*dim+sizes[targetLocation]], -1,expandedNodes[i]);
-//printf("T: %d\n", targetLocation);
-//printf("Sizes: %d\n", sizes[targetLocation]);
+
 					while(check==0)
 					{
 						int targetLocation=findNextInsertionPoint(sizes, k);
@@ -175,21 +172,9 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 				
 				}
 								
-			}*/
-
-			if(threadIdx.x==0)
-			{
-				for(int i=0;i<4*k;i++)
-				{
-					if(expandedNodes[i]==-1)
-						continue;
-					int targetLocation=findNextInsertionPoint(sizes, k);
-							array[targetLocation*dim+sizes[targetLocation]]=expandedNodes[i];
-					sizes[targetLocation]++;
-					
-				}
 			}
 
+			
 			
 			__syncthreads();
 				
