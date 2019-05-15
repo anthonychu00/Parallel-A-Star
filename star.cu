@@ -67,13 +67,14 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 	
 	while(checkIfQueueEmpty(array, dim, k) != 0)
 	{	
-
+		
+		__syncthreads();
 		if(flag == 1)
 		{
 			break;
 		}
 
-		__syncthreads();
+		
 		
 		
 		//stuff expandedNodes array
@@ -89,7 +90,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 			if(extracted == end || flag == 1)
 			{
 				flag = 1;
-				break;
+				continue;
 			}
 			
 			
@@ -161,7 +162,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 				
 		}//end of the larger if statement, coded this way to prevent warp divergence
 		
-		__syncthreads();
+		
 
 	}//end of while loop, shoould have found route or not by here
 	
