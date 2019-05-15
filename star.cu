@@ -1,5 +1,6 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //You need to compile the program as "nvcc -G star.cu"
+//There's an unknown issue compiling it out of debug mode.
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #include <assert.h>
 #include <curand.h>
