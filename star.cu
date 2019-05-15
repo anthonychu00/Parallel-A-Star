@@ -25,9 +25,10 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 	__shared__ int array [30];//simulates priority queues, k marker at each step (dim*k)=(16*5)
 	__shared__ int heuristics[30]; //will store the heuristics corresponding to a
 	__shared__ int sizes [5];//stores current sizes of priority queues
-	__shared__ int expandedNodes[20];//k*4 for 4 directions
+	__shared__ int flag;
+	int expandedNodes[4];//k*4 for 4 directions
 	int extracted;
-	int flag=0;
+	flag=0;
 	lowestCost[end] =0;
 	
 	
@@ -49,7 +50,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 		{
 			sizes[i] = 0;
 		}
-		for(int i =0; i<4*k;i++)
+		for(int i =0; i<4;i++)
 		{
 			expandedNodes[i]=-1;
 		}
@@ -65,7 +66,8 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 
 	
 	while(checkIfQueueEmpty(array,dim,k)!=0)
-	{
+	{	
+		__syncthreads();
 		
 		if(flag==1)
 		{
@@ -99,32 +101,32 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 			
 			
 			//dumps adjacent squares into array
-			expandedNodes[threadIdx.x*4]=top;
-			expandedNodes[threadIdx.x*4+1]=bottom;
-			expandedNodes[threadIdx.x*4+2]=left;
-			expandedNodes[threadIdx.x*4+3]=right;
-
+			expandedNodes[0]=top;
+			expandedNodes[1]=bottom;
+			expandedNodes[2]=left;
+			expandedNodes[3]=right;
+			//expandedNodes[threadIdx.x*4]=top;
 			for(int i =0; i<4;i++)
 			{
-				printf("%d ",expandedNodes[threadIdx.x*4+i]);
+				printf("%d ",expandedNodes[i]);
 			}
 				printf("Before dedup \n ");
-			//__syncthreads();
+			
 			
 			//checks adjacent squares
 			//deduplicates list
 			for(int i =0;i<4;i++)
 			{
-				int curNum = expandedNodes[threadIdx.x*4+i];
+				int curNum = expandedNodes[i];
 				
 			      if(curNum<0 || curNum>dim*dim|| grid[curNum]==0||lowestCost[extracted]+1>lowestCost[curNum])
 				{					
-					expandedNodes[threadIdx.x*4+i]=-1;
+					expandedNodes[i]=-1;
 					continue;
 				}//checks for invalid indices
 			
 
-				if(expandedNodes[threadIdx.x*4+i]!=-1)
+				if(expandedNodes[i]!=-1)
 				{
 					
 					//route is shorter, therefore update cost and previous node
@@ -137,11 +139,11 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 			}
 			for(int i =0; i<4;i++)
 			{
-				printf("%d ",expandedNodes[threadIdx.x*4+i]);
+				printf("%d ",expandedNodes[i]);
 			}	
 				printf("After dedup \n ");
 			
-			//__syncthreads();
+			
 
 			//start heuristic of Nodes not -1 in expandedNodes 
 			
@@ -153,7 +155,6 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 				{
 					int h = lowestCost[expandedNodes[i]]+				 							heuristic(dim,expandedNodes[i],end);
 					int check =0; 
-
 					while(check==0)
 					{
 						int targetLocation=findNextInsertionPoint(sizes, k);
@@ -174,9 +175,21 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k){//k is 
 								
 			}
 
+			/*if(threadIdx.x==0)
+			{
+				for(int i=0;i<4*k;i++)
+				{
+					if(expandedNodes[i]==-1)
+						continue;
+					int targetLocation=findNextInsertionPoint(sizes, k);
+							array[targetLocation*dim+sizes[targetLocation]]=expandedNodes[i];
+					sizes[targetLocation]++;
+					
+				}
+			}*/
+
 			
 			
-			__syncthreads();
 				
 		}//end of the larger if statement, coded this way to prevent warp divergence
 		
@@ -298,3 +311,15 @@ int main () {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
