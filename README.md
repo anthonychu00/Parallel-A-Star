@@ -1,4 +1,4 @@
-# Parallel-A-
+# Parallel-A-Star
 
 Individual Final Project for Prof. Jose Bento's Parallel Computing Class
 
