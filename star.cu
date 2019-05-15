@@ -115,37 +115,27 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 			{
 				int curNum = expandedNodes[threadIdx.x * 4 + i];
 				
-			      if(curNum<0 || curNum>dim*dim|| grid[curNum]==0||lowestCost[extracted]+1>lowestCost[curNum])
+			     	if(curNum<0 || curNum>dim*dim|| grid[curNum]==0||lowestCost[extracted]+1>lowestCost[curNum])
 				{					
 					expandedNodes[threadIdx.x * 4 + i] =- 1;
 					continue;
 				}//checks for invalid indices
-			
-
+				
 				if(expandedNodes[threadIdx.x * 4 + i] != -1)
 				{
-					
 					//route is shorter, therefore update cost and previous node
 					lowestCost[curNum] = lowestCost[extracted] + 1;
 					prevNode[curNum] = extracted;
 				}
-				
+								
+			}		
 
-				
-			}
-			//printf("After dedup: %d %d %d %d in thread %d\n ",expandedNodes[threadIdx.x*4+0],expandedNodes[threadIdx.x*4+1],expandedNodes[threadIdx.x*4+2],expandedNodes[threadIdx.x*4+3],threadIdx.x);
-			
-			
-
-			//start heuristic of Nodes not -1 in expandedNodes 
-			
+			//start heuristic of Nodes not -1 in expandedNodes 			
 			for(int i = 0;i < 4 ; i++)
 			{
 				int r = duplicateAdjacents(expandedNodes, expandedNodes[threadIdx.x * 4 + i],k,threadIdx.x * 4 + i);
 				if(r != -1)
-				{
 					atomicExch(&expandedNodes[r], -1);
-				}
 				
 				if(expandedNodes[threadIdx.x*4+i] != -1)
 				{
@@ -161,13 +151,10 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 							heuristics[targetLocation * dim + sizes[targetLocation]] = h;
 							sizes[targetLocation]++;	
 							organizeQueue(array, targetLocation, heuristics, h, sizes[targetLocation], dim);
-							check = 1;
-							
+							check = 1;		
 						}
 					}
-				
-				}
-								
+				}					
 			}			
 			
 				
@@ -176,6 +163,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 		__syncthreads();
 
 	}//end of while loop, shoould have found route or not by here
+	
 	if(threadIdx.x == 0){
 		printf("prev : \n%d\n", prevNode[end]);
 		int current = end;	
@@ -217,7 +205,6 @@ __device__ void organizeQueue(int * queue, int targetLocation, int * heuristics,
 			heuristics[dim * targetLocation + which] = temp1;
 			which--;
 		}
-
 	}
 }
 
@@ -226,9 +213,7 @@ __device__ int duplicateAdjacents(int * adjacents, int a, int k, int currentPos)
 	for(int i = 1; i < 4 * k ;i++)
 	{
 		if(adjacents[i] == a && i != currentPos)
-		{
 			return i;
-		}
 	}
 	return -1;
 }
