@@ -32,12 +32,12 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 	//presets shared memory
 	if (threadIdx.x == 0)
 	{
-		for(int i = 0; i < dim * k ;i++)
+		for(int i = 0; i < dim * k ; i++)
 		{
 			array[i] = -1;	
 		}
 		
-		for(int i = 0; i < dim * dim ;i++)
+		for(int i = 0; i < dim * dim ; i++)
 		{
 			lowestCost[i] = 2000;//whatever max int is
 			
@@ -46,7 +46,7 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 		{
 			sizes[i] = 0;
 		}
-		for(int i =0; i < 4 * k;i++)
+		for(int i = 0; i < 4 * k; i++)
 		{
 			expandedNodes[i] = -1;
 		}
@@ -129,9 +129,9 @@ __global__ void traverse(int * grid, int start, int end, int dim, int k, int * r
 			}		
 
 			//start heuristic of Nodes not -1 in expandedNodes 			
-			for(int i = 0;i < 4 ; i++)
+			for(int i = 0; i < 4 ; i++)
 			{
-				int r = duplicateAdjacents(expandedNodes, expandedNodes[threadIdx.x * 4 + i],k,threadIdx.x * 4 + i);
+				int r = duplicateAdjacents(expandedNodes, expandedNodes[threadIdx.x * 4 + i], k, threadIdx.x * 4 + i);
 				if(r != -1)
 					atomicExch(&expandedNodes[r], -1);
 				
